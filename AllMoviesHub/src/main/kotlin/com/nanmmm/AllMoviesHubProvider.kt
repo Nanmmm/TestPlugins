@@ -1,8 +1,14 @@
 package com.nanmmm
 
-import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
+override suspend fun loadLinks(
+    data: String,
+    isCasting: Boolean,
+    subtitleCallback: (SubtitleFile) -> Unit,
+    callback: (ExtractorLink) -> Unit
+): Boolean {
+    loadExtractor(data, subtitleCallback, callback)
+    return true
+}
 
 class AllMoviesHubProvider : MainAPI() {
     override var mainUrl = "https://allmovieshub.golf"
