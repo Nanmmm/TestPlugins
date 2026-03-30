@@ -1,14 +1,8 @@
 package com.nanmmm
 
-override suspend fun loadLinks(
-    data: String,
-    isCasting: Boolean,
-    subtitleCallback: (SubtitleFile) -> Unit,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
-    loadExtractor(data, subtitleCallback, callback)
-    return true
-}
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.utils.*
+import org.jsoup.nodes.Element
 
 class AllMoviesHubProvider : MainAPI() {
     override var mainUrl = "https://allmovieshub.golf"
@@ -25,7 +19,10 @@ class AllMoviesHubProvider : MainAPI() {
         "$mainUrl/south-movies/" to "South Indian",
     )
 
-    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+    override suspend fun getMainPage(
+        page: Int,
+        request: MainPageRequest
+    ): HomePageResponse {
         val url = if (page == 1) request.data else "${request.data}page/$page/"
         val doc = app.get(url).document
         val items = doc.select("article.post").mapNotNull { it.toSearchResult() }
@@ -34,7 +31,7 @@ class AllMoviesHubProvider : MainAPI() {
 
     private fun Element.toSearchResult(): SearchResponse? {
         val title = selectFirst("h2.post-title a")?.text() ?: return null
-        val href  = selectFirst("h2.post-title a")?.attr("href") ?: return null
+        val href = selectFirst("h2.post-title a")?.attr("href") ?: return null
         val poster = selectFirst("img")?.attr("src")
         return newMovieSearchResponse(title, href, TvType.Movie) {
             this.posterUrl = poster
@@ -48,23 +45,14 @@ class AllMoviesHubProvider : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse? {
         val doc = app.get(url).document
-        val title  = doc.selectFirst("h1.post-title")?.text() ?: return null
+        val title = doc.selectFirst("h1.post-title")?.text() ?: return null
         val poster = doc.selectFirst(".post-thumbnail img")?.attr("src")
-        val plot   = doc.selectFirst(".entry-content p")?.text()
-        val year   = Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
-
-        val links = doc.select("a[href]").filter { a ->
-            val href = a.attr("href")
-            href.contains("drive.google") ||
-            href.contains("gdrive")      ||
-            href.contains("mega.nz")     ||
-            href.contains("mediafire")
-        }.map { it.attr("href") }
-
-        return newMovieLoadResponse(title, url, TvType.Movie, links.firstOrNull() ?: url) {
+        val plot = doc.selectFirst(".entry-content p")?.text()
+        val year = Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
+        return newMovieLoadResponse(title, url, TvType.Movie, url) {
             this.posterUrl = poster
-            this.plot      = plot
-            this.year      = year
+            this.plot = plot
+            this.year = year
         }
     }
 
@@ -74,7 +62,13 @@ class AllMoviesHubProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        loadExtractor(data, mainUrl, subtitleCallback, callback)
+        val doc = app.get(data).document
+        doc.select("a[href]").forEach { a ->
+            val href = a.attr("href")
+            if (href.contains("drive.google") || href.contains("mega.nz") || href.contains("mediafire")) {
+                loadExtractor(href, data, subtitleCallback, callback)
+            }
+        }
         return true
     }
 }
