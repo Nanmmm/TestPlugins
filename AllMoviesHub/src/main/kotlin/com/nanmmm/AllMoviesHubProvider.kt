@@ -1,7 +1,6 @@
 package com.nanmmm
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 
 class AllMoviesHubProvider : MainAPI() {
@@ -9,7 +8,6 @@ class AllMoviesHubProvider : MainAPI() {
     override var name = "AllMoviesHub"
     override val hasMainPage = true
     override var lang = "en"
-    override val hasDownloadSupport = true
     override val supportedTypes = setOf(TvType.Movie)
 
     override val mainPage = mainPageOf(
@@ -54,21 +52,5 @@ class AllMoviesHubProvider : MainAPI() {
             this.plot = plot
             this.year = year
         }
-    }
-
-    override suspend fun loadLinks(
-        data: String,
-        isCasting: Boolean,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        val doc = app.get(data).document
-        doc.select("a[href]").forEach { a ->
-            val href = a.attr("href")
-            if (href.contains("drive.google") || href.contains("mega.nz") || href.contains("mediafire")) {
-                loadExtractor(href, data, subtitleCallback, callback)
-            }
-        }
-        return true
     }
 }
