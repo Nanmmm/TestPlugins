@@ -1,6 +1,15 @@
 package com.nanmmm
 
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
+import com.lagradost.cloudstream3.plugins.Plugin
+
+@CloudstreamPlugin
+class AllMoviesHubPlugin : Plugin() {
+    override fun load(context: android.content.Context) {
+        registerMainAPI(AllMoviesHubProvider())
+    }
+}
 
 class AllMoviesHubProvider : MainAPI() {
     override var mainUrl = "https://allmovieshub.golf"
@@ -16,10 +25,7 @@ class AllMoviesHubProvider : MainAPI() {
         "$mainUrl/south-movies/" to "South Indian",
     )
 
-    override suspend fun getMainPage(
-        page: Int,
-        request: MainPageRequest
-    ): HomePageResponse {
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val url = if (page == 1) request.data else "${request.data}page/$page/"
         val doc = app.get(url).document
         val items = doc.select("article.post").mapNotNull {
