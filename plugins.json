@@ -1,0 +1,20 @@
+[
+    {
+        "iconUrl": "https://allmovieshub.golf/wp-content/uploads/2021/06/cropped-favicon-1-192x192.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/user/repo",
+        "fileSize": 6519,
+        "status": 1,
+        "authors": [
+            "Nanmmm"
+        ],
+        "tvTypes": [
+            "Movie"
+        ],
+        "version": 1,
+        "internalName": "AllMoviesHub",
+        "description": "Watch Movies from AllMoviesHub \u2014 Bollywood, Hollywood & South",
+        "url": "https://raw.githubusercontent.com/user/repo/builds/AllMoviesHub.cs3",
+        "name": "AllMoviesHub"
+    }
+]
