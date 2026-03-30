@@ -15,7 +15,7 @@ class AllMoviesHubProvider : MainAPI() {
     override var mainUrl = "https://allmovieshub.golf"
     override var name = "AllMoviesHub"
     override val hasMainPage = true
-    override var lang = "en"
+    override var lang = "hi"
     override val supportedTypes = setOf(TvType.Movie)
 
     override val mainPage = mainPageOf(
